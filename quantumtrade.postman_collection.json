@@ -1,0 +1,133 @@
+{
+  "info": {
+    "name": "QuantumTrade API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for QuantumTrade API endpoints."
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"Password123!\",\n  \"email\": \"newuser@example.com\",\n  \"phone\": \"+15551234567\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/api/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "register"] }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@1234\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/api/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "login"] }
+      }
+    },
+    {
+      "name": "Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/api/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "me"] }
+      }
+    },
+    {
+      "name": "List Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/api/users", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "users"] }
+      }
+    },
+    {
+      "name": "List Promos",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/api/promos", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "promos"] }
+      }
+    },
+    {
+      "name": "Create Promo",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"PROMO20\",\n  \"discountPercent\": 20,\n  \"maxUses\": 10\n}"
+        },
+        "url": { "raw": "http://localhost:3000/api/promos", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "promos"] }
+      }
+    },
+    {
+      "name": "Redeem Promo",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"code\": \"PROMO20\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/api/promos/redeem", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "promos", "redeem"] }
+      }
+    },
+    {
+      "name": "Get Market Trend",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/api/market-trend", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "market-trend"] }
+      }
+    },
+    {
+      "name": "Set Market Trend",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"trend\": \"bull\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/api/market-trend", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "market-trend"] }
+      }
+    },
+    {
+      "name": "Market Data",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/market", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["market"] }
+      }
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:3000/health", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["health"] }
+      }
+    }
+  ]
+}

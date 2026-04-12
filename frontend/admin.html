@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumTrade | User Portal</title>
+    <style>
+        html { scroll-behavior: smooth; }
+        *::-webkit-scrollbar { width: 10px; height: 10px; }
+        *::-webkit-scrollbar-track { background: rgba(8, 11, 20, 0.95); }
+        *::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.32); border-radius: 999px; }
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top, rgba(56, 139, 253, 0.12), transparent 28%), #080b14; color: #e2e8f0; padding: 0; margin: 0; }
+        .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+        .sidebar { padding: 24px; background: rgba(7, 12, 22, 0.98); border-right: 1px solid #1f2937; display: flex; flex-direction: column; gap: 24px; }
+        .brand-panel { display: flex; flex-direction: column; gap: 8px; }
+        .brand-label { text-transform: uppercase; letter-spacing: 0.2em; color: #7c3aed; opacity: 0.9; }
+        .brand-panel strong { font-size: 1.8rem; color: #63b3ed; }
+        .nav-panel { display: grid; gap: 10px; }
+        .nav-link { text-align: left; padding: 14px 16px; border-radius: 12px; border: none; background: #0f1720; color: #cbd5e1; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+        .nav-link:hover { background: #1f2937; transform: translateX(2px); }
+        .nav-link.active { background: #2563eb; color: white; }
+        .sidebar-stats { display: grid; gap: 12px; }
+        .stat-item { background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 16px; }
+        .stat-item span { display: block; color: #94a3b8; margin-bottom: 8px; }
+        .stat-item strong { display: block; font-size: 1.3rem; }
+        .account-holdings { margin-top: 18px; }
+        .main-panel { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        .hero-bar { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 24px; background: #0f1720; border: 1px solid #1f2937; border-radius: 22px; }
+        .hero-bar h1 { margin: 0; font-size: 2rem; }
+        .hero-subtitle { color: #cbd5e1; margin: 8px 0 0; }
+        .hero-input { display: flex; gap: 12px; width: min(100%, 420px); }
+        .hero-input input { flex: 1; background: #08101f; border-color: #2d3748; }
+        .hero-input button { width: 140px; background: #10b981; border-color: #10b981; }
+        .purchase-panel { display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 12px; align-items: end; margin-top: 20px; }
+        .purchase-panel select,
+        .purchase-panel input { width: 100%; }
+        .control-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 24px; border: 1px solid #1f2937; border-radius: 18px; background: #08101f; }
+        .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: rgba(56, 139, 253, 0.12); color: #bfdbfe; }
+        .control-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+        .trend-button { padding: 12px 18px; border: none; border-radius: 12px; background: #2563eb; color: white; cursor: pointer; transition: transform 0.2s, opacity 0.2s; }
+        .trend-button:hover { transform: translateY(-1px); opacity: 0.96; }
+        .trend-button.danger { background: #ef4444; }
+        .message { margin-top: 0; padding: 16px 20px; border-radius: 18px; }
+        .message.info { background: rgba(56, 139, 253, 0.12); color: #bfdbfe; }
+        .message.success { background: rgba(16, 185, 129, 0.16); color: #a7f3d0; }
+        .message.error { background: rgba(248, 113, 113, 0.14); color: #fecaca; }
+        .panel { margin-top: 0; }
+        .panel.card { background: rgba(15, 23, 42, 0.95); border-radius: 24px; border: 1px solid #1f2937; padding: 24px; }
+        .panel-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+        .form-panel { display: grid; gap: 14px; }
+        .form-panel label { display: block; color: #e2e8f0; font-size: 1rem; }
+        .form-panel input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid #475569; background: #020916; color: #f8fafc; font-size: 1rem; }
+        .form-panel input::placeholder { color: #94a3b8; }
+        .form-panel button { padding: 14px 18px; font-size: 1rem; }
+        .section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
+        .grid-large { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .market-box { min-height: 260px; }
+        .activity-card { display: grid; gap: 14px; padding: 20px; background: #0f1720; border-radius: 20px; border: 1px solid #1f2937; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .admin-table th,
+        .admin-table td { text-align: left; padding: 14px 12px; border-bottom: 1px solid #1f2937; }
+        .admin-table th { color: #94a3b8; }
+        .small-table td { padding: 10px 8px; }
+        .empty-state { color: #94a3b8; padding: 20px 0; }
+        .hero-input input,
+        .form-panel input { background: #08101f; border: 1px solid #1f2937; }
+        .hero-input button,
+        .form-panel button,
+        #logout-button { border-radius: 14px; }
+        .promo-form { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; }
+        .promo-form button { width: auto; min-width: 150px; }
+        #login-view { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 32px; }
+        #login-view .panel.card { max-width: 760px; width: 100%; }
+        .auth-actions { display: grid; gap: 10px; margin-top: 16px; }
+        .social-button { width: 100%; padding: 16px 18px; border: 1px solid #1f2937; border-radius: 14px; background: #0f1720; color: #e2e8f0; font-size: 1rem; cursor: pointer; transition: transform 0.15s ease, background 0.15s ease; }
+        .social-button:hover { transform: translateY(-1px); background: #111827; }
+        .social-button.google { border-color: #4285f4; color: #eaf4ff; }
+        .social-button.microsoft { border-color: #2f92f0; color: #f3f4f6; }
+        .market-control-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 18px; }
+        .market-control-panel .trend-status { color: #cbd5e1; font-weight: 600; }
+        .stock-card { display: grid; gap: 10px; background: #08101f; border: 1px solid #1f2937; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+        .stock-card-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .stock-name { font-weight: 700; color: #c7d2fe; }
+        .stock-card-details { font-weight: 600; }
+        .stock-card-footer { color: #9ca3af; font-size: 0.95rem; }
+        .price-positive { color: #34d399; }
+        .price-negative { color: #f87171; }
+        .logout-button { background: #db2777; border: none; color: white; padding: 14px 18px; cursor: pointer; margin-top: 16px; }
+        .logout-button.hidden { display: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body data-page="admin">
+    <div id="message" class="message info">Please log in to access the admin dashboard.</div>
+    <div id="login-view" class="login-view">
+        <section class="panel card">
+            <div class="section-heading">
+                <div>
+                    <h2>Welcome to QuantumTrade</h2>
+                    <p>Sign in to manage promos, monitor users, and control market trends.</p>
+                </div>
+            </div>
+            <div class="panel-grid">
+                <div>
+                    <h3>Login</h3>
+                    <form id="login-form" class="form-panel">
+                        <label>Username<input name="username" required autocomplete="username" /></label>
+                        <label>Password<input type="password" name="password" required autocomplete="current-password" /></label>
+                        <button type="submit">Login</button>
+                    </form>
+                    <div class="auth-actions">
+                        <button type="button" id="google-login" class="social-button google">Login with Google</button>
+                        <button type="button" id="microsoft-login" class="social-button microsoft">Login with Microsoft</button>
+                    </div>
+                </div>
+                <div>
+                    <h3>Register</h3>
+                    <form id="register-form" class="form-panel">
+                        <label>Username<input name="username" required autocomplete="username" /></label>
+                        <label>Password<input type="password" name="password" required autocomplete="new-password" /></label>
+                        <label>Phone<input name="phone" autocomplete="tel" /></label>
+                        <button type="submit">Create Account</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="app-view" class="app-shell hidden">
+        <aside class="sidebar">
+            <div class="brand-panel">
+                <span class="brand-label">Portal</span>
+                <strong id="sidebar-user">Guest</strong>
+            </div>
+            <nav class="nav-panel">
+                <button class="nav-link active" data-target="dashboard-panel">Dashboard / Market</button>
+                <button class="nav-link" data-target="activity-panel">Server Activity</button>
+                <button class="nav-link" data-target="users-panel">Data of Users</button>
+                <button class="nav-link" data-target="promo-panel">Manage Promos</button>
+            </nav>
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <span>Net Worth</span>
+                    <strong id="sidebar-networth">$0.00</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Cash</span>
+                    <strong id="sidebar-cash">$0.00</strong>
+                </div>
+                <div class="stat-item">
+                    <span>All Time PnL</span>
+                    <strong id="sidebar-pnl">$0.00</strong>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            <header class="hero-bar">
+                <div>
+                    <h1>Stock Details & Portfolios</h1>
+                    <p class="hero-subtitle">Admin God Mode controls for live market and promo management.</p>
+                </div>
+                <div class="hero-input">
+                    <input id="promo-input" placeholder="Promo Code" />
+                    <button id="redeem-promo">Redeem</button>
+                </div>
+            </header>
+
+            <section class="panel card">
+                <div class="section-heading">
+                    <h2>Account Summary</h2>
+                    <p>Logged-in admin profile and account details.</p>
+                </div>
+                <div class="panel-grid">
+                    <div class="stat-item">
+                        <span>Username</span>
+                        <strong id="profile-username">-</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Role</span>
+                        <strong id="profile-role">-</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Cash</span>
+                        <strong id="profile-cash">$0.00</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>PnL</span>
+                        <strong id="profile-pnl">$0.00</strong>
+                    </div>
+                </div>
+                <div class="empty-state account-holdings">
+                    Holdings: <pre id="profile-holdings">{}</pre>
+                </div>
+            </section>
+
+            <section id="dashboard-panel" class="panel card hidden">
+                <div class="section-heading">
+                    <h2>Live Market</h2>
+                    <p>Prices update every 3 seconds.</p>
+                </div>
+                <div class="market-control-panel">
+                    <div class="trend-status">Market Trend: <strong id="market-trend">NORMAL</strong></div>
+                    <div class="control-buttons">
+                        <button class="trend-button" data-trend="normal">Normal</button>
+                        <button class="trend-button" data-trend="bull">Bull</button>
+                        <button class="trend-button" data-trend="bear">Bear</button>
+                        <button class="trend-button danger" data-trend="crash">Crash</button>
+                    </div>
+                </div>
+                <form id="purchase-form" class="form-panel purchase-panel">
+                    <label>
+                        Stock
+                        <select id="stock-select" name="stock">
+                            <option value="BTC">BTC</option>
+                            <option value="ETH">ETH</option>
+                            <option value="SOL">SOL</option>
+                            <option value="ADA">ADA</option>
+                            <option value="LINK">LINK</option>
+                        </select>
+                    </label>
+                    <label>
+                        Quantity
+                        <input name="quantity" type="number" min="1" value="1" />
+                    </label>
+                    <button type="button" id="stock-max-button" class="trend-button">Max</button>
+                    <button type="submit" class="trend-button">Buy</button>
+                </form>
+                <div class="grid-large">
+                    <div class="market-box card">
+                        <h3>Live Market</h3>
+                        <div id="prices">Loading market data...</div>
+                    </div>
+                    <div class="market-box card">
+                        <h3>My Portfolio</h3>
+                        <div id="portfolio-summary">No portfolio data yet.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="activity-panel" class="panel card hidden">
+                <div class="section-heading">
+                    <h2>Server Activity</h2>
+                    <p>Monitor backend health and response status.</p>
+                </div>
+                <div class="activity-card">
+                    <div><strong>Status:</strong> <span id="health-status">Checking...</span></div>
+                    <div><strong>Database:</strong> <span id="health-db">Checking...</span></div>
+                    <div><strong>Last checked:</strong> <span id="health-time">-</span></div>
+                </div>
+            </section>
+
+            <section id="users-panel" class="panel card hidden">
+                <div class="section-heading">
+                    <h2>Data of Users</h2>
+                    <p>All registered users and account balances.</p>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Cash</th>
+                            <th>Holdings</th>
+                            <th>PnL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list">
+                        <tr><td colspan="5">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="promo-panel" class="panel card hidden">
+                <div class="section-heading">
+                    <h2>Manage Promos</h2>
+                    <p>Create promotional codes and track usage.</p>
+                </div>
+                <form id="promo-form" class="form-panel promo-form">
+                    <label>Promo Code<input name="code" required /></label>
+                    <label>Discount %<input name="discountPercent" type="number" min="1" max="100" required /></label>
+                    <label>Max Uses<input name="maxUses" type="number" min="1" required /></label>
+                    <button type="submit">Create Promo</button>
+                </form>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Max Uses</th>
+                            <th>Used</th>
+                            <th>Active</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promo-list">
+                        <tr><td colspan="6">Loading promo codes...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <button id="logout-button" class="logout-button hidden">Logout</button>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

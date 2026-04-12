@@ -1,0 +1,22 @@
+QuantumTrade project saved data
+Date: April 11, 2026
+
+Included files:
+- server.js
+- routes/users.js
+- routes/market.js
+- models/User.js
+- frontend/index.html
+- frontend/admin.html
+- frontend/app.js
+- package.json
+
+Dependencies installed:
+- bcrypt
+- cors
+- express
+- jsonwebtoken
+- mongoose
+
+Notes:
+This folder was created to store project data and confirm the workspace files are saved locally.
