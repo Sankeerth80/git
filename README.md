@@ -35,6 +35,24 @@ You can override using environment variables:
 - `MONGODB_URI`
 - `JWT_SECRET`
 
+## Environment Variables
+
+You can also create a `.env` file in the project root with:
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/quantumtrade
+JWT_SECRET=your_secret_here
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=Admin@1234
+```
+
+Then start the app with:
+
+```bash
+npm install
+npm start
+```
+
 ## API Endpoints
 
 - `POST /api/register`
@@ -58,6 +76,39 @@ A sample Postman collection is included in `quantumtrade.postman_collection.json
 - `logs/access.log` and `logs/error.log` are created at runtime for monitoring requests and errors.
 - Make sure MongoDB is running locally or provide `MONGODB_URI`.
 - The app uses JWT authentication; set `JWT_SECRET` in production.
+
+## Deployment
+
+This app can be deployed to hosts such as Render, Railway, or any Docker-compatible platform.
+
+### Render
+
+1. Create an account at `https://render.com`.
+2. Connect your GitHub repository.
+3. Create a new Web Service.
+4. Select `npm install` as the build command and `npm start` as the start command.
+5. Set these environment variables in Render:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `ADMIN_USERNAME`
+   - `ADMIN_PASSWORD`
+6. Deploy.
+
+### Docker
+
+A `Dockerfile` is included, so you can deploy with containers.
+
+Build and run locally:
+
+```bash
+docker build -t quantumtrade .
+docker run -p 3000:3000 \
+  -e MONGODB_URI="mongodb://127.0.0.1:27017/quantumtrade" \
+  -e JWT_SECRET="your_secret_here" \
+  -e ADMIN_USERNAME="admin" \
+  -e ADMIN_PASSWORD="Admin@1234" \
+  quantumtrade
+```
 
 ## Publish to GitHub
 
