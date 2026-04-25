@@ -57,6 +57,22 @@ exports.createPromo = async (req, res, next) => {
 };
 
 exports.redeemPromo = async (req, res, next) => {
+  const idempotencyKey = req.headers['idempotency-key'];
+  if (!idempotencyKey) {
+    return res.status(400).json({ error: 'Idempotency-Key header is required' });
+  }
+
+  // Attempt to save the idempotency key. If it fails with a duplicate key error (11000),
+  // it means this request is a duplicate being processed concurrently or recently.
+  try {
+    await require('../models/IdempotencyKey').create({ key: `${req.user.id}-${idempotencyKey}` });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'Duplicate request detected. Please wait.' });
+    }
+    return next(error);
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 

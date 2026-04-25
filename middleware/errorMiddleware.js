@@ -6,13 +6,15 @@ const notFound = (req, res, next) => {
 
 const errorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  
-  // Log error (optional: you could use Morgan/Winston here)
-  console.error(`[ERROR] ${err.message} \n ${err.stack}`);
+  res.status(statusCode);
 
-  res.status(statusCode).json({
-    error: err.message || 'Internal Server Error',
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  res.json({
+    success: false,
+    message: err.message,
+    code: err.code || 'SERVER_ERROR',
+    stack: isProduction ? undefined : err.stack,
   });
 };
 

@@ -153,6 +153,8 @@ if (require.main === module) {
   server.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   });
+  // Prevent long-running idle connections from exhausting resources
+  server.setTimeout(15000);
 }
 
 module.exports = server;
