@@ -36,10 +36,21 @@ connectDB();
 // Security & Optimization Middlewares
 app.use(helmet());
 app.use(compression());
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin '${origin}' not allowed`));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 
 // Setup logging with Morgan
@@ -105,8 +116,17 @@ async function ensureAdminUser() {
     const existingAdmin = await User.findOne({ role: 'admin' });
     if (existingAdmin) return;
 
-    const adminUsername = process.env.ADMIN_USERNAME || 'Sankeerth';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'Satyamani80';
+    const adminUsername = process.env.ADMIN_USERNAME;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminUsername || !adminPassword) {
+      console.warn(
+        'ensureAdminUser: ADMIN_USERNAME or ADMIN_PASSWORD env var is not set — skipping admin creation. ' +
+        'Set both env vars to create an initial admin account.'
+      );
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
     const adminUser = new User({

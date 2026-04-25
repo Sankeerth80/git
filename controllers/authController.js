@@ -14,7 +14,8 @@ const generateToken = (id, username, role) => {
 exports.register = async (req, res, next) => {
   try {
     const { username, password, phone, email } = req.body;
-    
+    const ip = req.ip;
+
     const normalizedUsername = String(username || '').trim();
     const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
 
@@ -26,6 +27,7 @@ exports.register = async (req, res, next) => {
     const existingUser = await User.findOne({ $or: orConditions });
 
     if (existingUser) {
+      console.warn(`[auth] register conflict: username="${normalizedUsername}" email="${normalizedEmail || ''}" ip=${ip}`);
       return res.status(409).json({ error: 'Username or email already exists' });
     }
 
@@ -35,12 +37,13 @@ exports.register = async (req, res, next) => {
       email: normalizedEmail,
       password: hashedPassword,
       phone,
-      ip: req.ip,
+      ip,
       cash: 1000,
       holdings: {},
     });
 
     await user.save();
+    console.info(`[auth] register success: username="${user.username}" id=${user._id} ip=${ip}`);
 
     res.status(201).json({
       token: generateToken(user._id, user.username, user.role),
@@ -61,6 +64,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
+    const ip = req.ip;
 
     const loginIdentifier = String(username || '').trim();
     const user = await User.findOne({
@@ -71,14 +75,17 @@ exports.login = async (req, res, next) => {
     });
 
     if (!user || !user.password) {
+      console.warn(`[auth] login failure: identifier="${loginIdentifier}" ip=${ip} reason=user_not_found`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.warn(`[auth] login failure: identifier="${loginIdentifier}" id=${user._id} ip=${ip} reason=bad_password`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.info(`[auth] login success: username="${user.username}" id=${user._id} role=${user.role} ip=${ip}`);
     res.json({
       token: generateToken(user._id, user.username, user.role),
       user: {
@@ -99,7 +106,10 @@ exports.googleLogin = async (req, res, next) => {
   // Same logic as before, refactored to controller
   try {
     const { idToken } = req.body;
+    const ip = req.ip;
+
     if (!GOOGLE_CLIENT_ID) {
+      console.error(`[auth] google login error: GOOGLE_CLIENT_ID not configured ip=${ip}`);
       return res.status(500).json({ error: 'Google client ID is not configured' });
     }
 
@@ -127,14 +137,18 @@ exports.googleLogin = async (req, res, next) => {
         email,
         googleId,
         role: 'user',
-        ip: req.ip,
+        ip,
         cash: 1000,
         holdings: {},
       });
       await user.save();
-    } else if (!user.googleId) {
-      user.googleId = googleId;
-      await user.save();
+      console.info(`[auth] google login success (new user): username="${user.username}" id=${user._id} ip=${ip}`);
+    } else {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+      console.info(`[auth] google login success: username="${user.username}" id=${user._id} role=${user.role} ip=${ip}`);
     }
 
     res.json({
@@ -149,6 +163,7 @@ exports.googleLogin = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.warn(`[auth] google login failure: ip=${req.ip} error="${error.message}"`);
     res.status(401).json({ error: 'Invalid Google ID token' });
   }
 };
