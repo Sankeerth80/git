@@ -1,134 +1,62 @@
-# QuantumTrade
+# QuantumTrade Platform
 
-A simple trading platform backend and frontend demo built with Express, MongoDB, and a static auth landing page.
+A premium, MVC-architected, and fully scalable stock trading platform built with Node.js, Express, and MongoDB.
 
-## Install
+## Features
+- **Strict MVC Architecture**: Organized, clean, and testable codebase.
+- **Atomic Transactions**: Wallet modifications and trades use Mongoose Transactions to guarantee 100% data consistency.
+- **Premium Glassmorphism UI**: Beautiful, vibrant, and interactive user interfaces for both traders and admins.
+- **Robust Security**: Rate limiting, NoSQL injection protection, and comprehensive error handling.
+- **Admin God Mode**: Real-time control over market trends and promo codes.
 
+---
+
+## 🚀 Deployment Guide
+
+This application is ready to be deployed to production using Docker, Railway, or any platform that supports Docker containers.
+
+### 1. MongoDB Atlas Setup
+Because this application uses **Mongoose Transactions** for atomic operations (preventing negative balances and double-spend), you MUST use a MongoDB Replica Set. MongoDB Atlas provides this by default.
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Go to **Network Access** and whitelist your specific IP address: `106.208.20.39/32`. Note: If you are deploying to Railway, you should also add `0.0.0.0/0` to allow the Railway servers to connect.
+3. Go to **Database Access** and create a user with a password.
+4. Go to **Databases** > **Connect** > **Connect your application** and copy the Connection String.
+5. Set this string as the `MONGODB_URI` environment variable in your deployment platform.
+
+### 2. Deploying to Railway (Recommended)
+Railway natively supports Dockerfile deployments and this repo contains a `railway.json` file.
+1. Push this repository to GitHub.
+2. Log into [Railway.app](https://railway.app/).
+3. Click **New Project** -> **Deploy from GitHub repo** and select your repository.
+4. Railway will automatically detect the `Dockerfile` and `railway.json` configuration.
+5. Go to the **Variables** tab in Railway and add the following:
+   - `MONGODB_URI` = Your Atlas connection string
+   - `JWT_SECRET` = A strong secret key
+   - `NODE_ENV` = `production`
+6. Once built, go to **Settings** -> **Networking** and generate a Public Domain.
+
+### 3. Docker Hub & Manual Deployment
+To build and push the Docker image manually to Docker Hub:
 ```bash
-npm install
+# 1. Build the image
+docker build -t your-docker-username/quantumtrade .
+
+# 2. Login to Docker Hub
+docker login
+
+# 3. Push the image
+docker push your-docker-username/quantumtrade
 ```
 
-## Run
-
+You can then pull this image on any VPS (like DigitalOcean, AWS EC2) and run it:
 ```bash
-npm start
+docker run -d -p 3000:3000 -e MONGODB_URI="your_atlas_uri" -e NODE_ENV="production" your-docker-username/quantumtrade
 ```
 
-Then open:
+---
 
-- `http://localhost:3000` for the user auth page
-- `http://localhost:3000/admin` for the admin dashboard
-
-## Default accounts
-
-The server creates defaults on startup if they do not exist:
-
-- Admin: `admin` / `Admin@1234`
-- User: `Sankeerth` / `Sankeerth@80`
-
-You can override using environment variables:
-
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
-- `DEFAULT_USERNAME`
-- `DEFAULT_PASSWORD`
-- `MONGODB_URI`
-- `JWT_SECRET`
-
-## Environment Variables
-
-You can also create a `.env` file in the project root with:
-
-```env
-MONGODB_URI=mongodb://127.0.0.1:27017/quantumtrade
-JWT_SECRET=your_secret_here
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=Admin@1234
-```
-
-Then start the app with:
-
-```bash
-npm install
-npm start
-```
-
-## API Endpoints
-
-- `POST /api/register`
-- `POST /api/login`
-- `GET /api/me`
-- `GET /api/users`
-- `GET /api/promos`
-- `POST /api/promos`
-- `POST /api/promos/redeem`
-- `GET /api/market-trend`
-- `POST /api/market-trend`
-- `GET /market`
-- `GET /health`
-
-## Postman
-
-A sample Postman collection is included in `quantumtrade.postman_collection.json` for testing the API endpoints.
-
-## Notes
-
-- `logs/access.log` and `logs/error.log` are created at runtime for monitoring requests and errors.
-- Make sure MongoDB is running locally or provide `MONGODB_URI`.
-- The app uses JWT authentication; set `JWT_SECRET` in production.
-
-## Deployment
-
-This app can be deployed to hosts such as Render, Railway, or any Docker-compatible platform.
-
-### Render
-
-1. Create an account at `https://render.com`.
-2. Connect your GitHub repository.
-3. Create a new Web Service.
-4. Select `npm install` as the build command and `npm start` as the start command.
-5. Set these environment variables in Render:
-   - `MONGODB_URI`
-   - `JWT_SECRET`
-   - `ADMIN_USERNAME`
-   - `ADMIN_PASSWORD`
-6. Deploy.
-
-### Docker
-
-A `Dockerfile` is included, so you can deploy with containers.
-
-Build and run locally:
-
-```bash
-docker build -t quantumtrade .
-docker run -p 3000:3000 \
-  -e MONGODB_URI="mongodb://127.0.0.1:27017/quantumtrade" \
-  -e JWT_SECRET="your_secret_here" \
-  -e ADMIN_USERNAME="admin" \
-  -e ADMIN_PASSWORD="Admin@1234" \
-  quantumtrade
-```
-
-## Publish to GitHub
-
-1. Initialize the repository:
-
-```bash
-git init
-```
-
-2. Add files and create the first commit:
-
-```bash
-git add .
-git commit -m "Initial commit: QuantumTrade app with auth, admin dashboard, and logging"
-```
-
-3. Add your GitHub remote and push:
-
-```bash
-git remote add origin https://github.com/<your-username>/<repo-name>.git
- git branch -M main
-git push -u origin main
-```
+## 🧪 Postman Testing
+A comprehensive `quantumtrade.postman_collection.json` is included in the root directory. 
+1. Import this file into Postman.
+2. Set the `baseUrl` variable to your production URL (or `http://localhost:3000` for local testing).
+3. Use the `/api/auth/login` route to get a token, and paste it into the `token` variable to authenticate all other requests.

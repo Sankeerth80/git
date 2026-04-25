@@ -4,10 +4,11 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, trim: true, lowercase: true, index: true },
     password: String,
+    googleId: { type: String, unique: true, sparse: true },
     role: { type: String, default: 'user' },
     phone: String,
     ip: String,
-    cash: { type: Number, default: 1000 },
+    cash: { type: Number, default: 1000, min: 0 },
     holdings: { type: Object, default: {} },
     pnl: { type: Number, default: 0 }
 });

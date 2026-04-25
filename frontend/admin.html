@@ -98,6 +98,7 @@
                 <div>
                     <h2>Welcome to QuantumTrade</h2>
                     <p>Sign in to manage promos, monitor users, and control market trends.</p>
+                    <p class="small-note">Admin default login: <strong>Sankeerth</strong> / <strong>Satyamani80</strong></p>
                 </div>
             </div>
             <div class="panel-grid">
@@ -277,16 +278,17 @@
                     <p>Create promotional codes and track usage.</p>
                 </div>
                 <form id="promo-form" class="form-panel promo-form">
-                    <label>Promo Code<input name="code" required /></label>
-                    <label>Discount %<input name="discountPercent" type="number" min="1" max="100" required /></label>
+                    <label>Promo Code<input name="code" /></label>
+                    <label>Amount<input name="amount" type="number" min="1" required placeholder="1000" /></label>
                     <label>Max Uses<input name="maxUses" type="number" min="1" required /></label>
+                    <button type="button" id="generate-code">Generate Code</button>
                     <button type="submit">Create Promo</button>
                 </form>
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Code</th>
-                            <th>Discount</th>
+                            <th>Amount</th>
                             <th>Max Uses</th>
                             <th>Used</th>
                             <th>Active</th>

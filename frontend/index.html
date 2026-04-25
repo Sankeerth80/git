@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockVerse — Sign In</title>
-    <meta name="description" content="StockVerse premium trading platform — sign in or create your account.">
+    <title>Stocks — Log In or Sign Up</title>
+    <meta name="description" content="Stocks login page clone for the frontend demo.">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
@@ -18,55 +18,24 @@
 
         <!-- ══ LEFT — Branding ══ -->
         <div class="auth-brand">
-            <!-- Animated ticker strip -->
-            <div class="ticker-strip">
-                <div class="ticker-inner" id="tickerInner">
-                    <span class="tick-item">AAPL <span class="up">▲ 182.52</span></span>
-                    <span class="tick-item">TSLA <span class="up">▲ 248.42</span></span>
-                    <span class="tick-item">NVDA <span class="up">▲ 875.40</span></span>
-                    <span class="tick-item">BTC <span class="up">▲ 68,420</span></span>
-                    <span class="tick-item">ETH <span class="down">▼ 3,520</span></span>
-                    <span class="tick-item">GOOGL<span class="up">▲ 141.80</span></span>
-                    <span class="tick-item">META <span class="up">▲ 502.30</span></span>
-                    <span class="tick-item">AMZN <span class="down">▼ 178.35</span></span>
-                    <span class="tick-item">DOGE <span class="up">▲ 0.165</span></span>
-                    <span class="tick-item">AAPL <span class="up">▲ 182.52</span></span>
-                    <span class="tick-item">TSLA <span class="up">▲ 248.42</span></span>
-                    <span class="tick-item">NVDA <span class="up">▲ 875.40</span></span>
-                    <span class="tick-item">BTC <span class="up">▲ 68,420</span></span>
-                    <span class="tick-item">ETH <span class="down">▼ 3,520</span></span>
-                    <span class="tick-item">GOOGL<span class="up">▲ 141.80</span></span>
-                    <span class="tick-item">META <span class="up">▲ 502.30</span></span>
-                    <span class="tick-item">AMZN <span class="down">▼ 178.35</span></span>
-                    <span class="tick-item">DOGE <span class="up">▲ 0.165</span></span>
-                </div>
-            </div>
-
-            <!-- Floating orbs -->
-            <div class="orb orb-1"></div>
-            <div class="orb orb-2"></div>
-            <div class="orb orb-3"></div>
-
-            <!-- Brand content -->
             <div class="brand-logo">
-                <div class="logo-icon">📈</div>
-                <div class="logo-text">StockVerse</div>
+                <div class="logo-icon">S</div>
+                <div class="logo-text">stocks</div>
             </div>
-            <h1 class="brand-tagline">Trade. Win.<br><span>Dominate.</span></h1>
-            <p class="brand-sub">The premium paper trading platform with real-time market simulation, God Mode admin
-                controls, and margin trading for serious traders.</p>
+            <h1 class="brand-tagline">Build your trading portfolio with smart funding.</h1>
+            <p class="brand-sub">Stocks gives you demo cash and market insights to explore trading.</p>
             <div class="brand-stats">
                 <div class="stat-item">
-                    <span class="stat-val">10K+</span>
-                    <span class="stat-lbl">Active Traders</span>
+                    <span class="stat-val">1.6B</span>
+                    <span class="stat-lbl">Traders use Stocks</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-val">10</span>
-                    <span class="stat-lbl">Live Assets</span>
+                    <span class="stat-val">Instant</span>
+                    <span class="stat-lbl">Updates & stories</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-val">$1M+</span>
-                    <span class="stat-lbl">Simulated Volume</span>
+                    <span class="stat-val">Always</span>
+                    <span class="stat-lbl">Keep in touch</span>
                 </div>
             </div>
         </div>
@@ -77,8 +46,8 @@
 
                 <!-- Sign In / Sign Up tabs -->
                 <div class="auth-tabs">
-                    <button class="auth-tab active" data-tab="signin" id="tabSignin">Sign In</button>
-                    <button class="auth-tab" data-tab="signup" id="tabSignup">Sign Up</button>
+                    <button class="auth-tab active" data-tab="signin" id="tabSignin">Log In</button>
+                    <button class="auth-tab" data-tab="signup" id="tabSignup">Create Account</button>
                 </div>
 
                 <!-- Login method pills -->
@@ -88,14 +57,7 @@
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                             <polyline points="22,6 12,13 2,6" />
                         </svg>
-                        Email
-                    </button>
-                    <button class="method-pill" data-method="phone" id="pillPhone">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path
-                                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 0116 2.18 2 2 0 0122 4.18v3a2 2 0 01-1.64 2A16 16 0 0116 7.34" />
-                        </svg>
-                        Phone OTP
+                        Email or Phone
                     </button>
                     <button class="method-pill" data-method="social" id="pillSocial">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -103,7 +65,7 @@
                             <line x1="2" y1="12" x2="22" y2="12" />
                             <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
                         </svg>
-                        Social
+                        Stocks
                     </button>
                 </div>
 
@@ -137,7 +99,7 @@
                                     autocomplete="current-password">
                             </div>
                         </div>
-                        <button class="btn btn-primary mt-8" id="btnSignIn">Sign In</button>
+                        <button class="btn btn-primary mt-8" id="btnSignIn">Log In</button>
                     </div>
 
                     <div id="suEmailSection" class="hidden">
@@ -224,22 +186,142 @@
 
                 <!-- SOCIAL FORM -->
                 <div class="auth-form-body" id="formSocial">
-                    <p class="form-caption">Continue with your existing account</p>
+                    <p class="form-caption">Continue with Stocks for the fastest login.</p>
                     <div class="social-btns">
-                        <button class="btn-social" id="btnGoogle" type="button">
+                        <button class="btn-social google-btn" id="btnGoogleAuth" type="button">
                             Continue with Google
                         </button>
-                        <button class="btn-social" id="btnMicrosoft" type="button">
-                            Continue with Microsoft
+                        <button class="btn-social facebook-btn" id="btnFacebook" type="button">
+                            Continue with Stocks
                         </button>
                     </div>
-                    <div class="divider"><span>or sign in with email</span></div>
-                    <button class="btn btn-ghost full-width" type="button" onclick="switchMethod('email')">Use Email /
-                        Password</button>
-                    <p class="form-caption">OAuth requires API credentials. For demo, use Email or Phone OTP.</p>
+                    <div class="divider"><span>or sign in with email or phone</span></div>
+                    <button class="btn btn-ghost full-width" type="button" onclick="switchMethod('email')">Use Email / Password</button>
+                    <p class="form-caption">Stocks-style login page for demo. Actual OAuth is not configured.</p>
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    <div id="app-view" class="user-app-wrap hidden">
+        <div class="user-shell">
+            <aside class="user-sidebar">
+                <div class="user-brand">
+                    <h2>User Portal</h2>
+                    <p class="small-note">Use your account to trade, redeem promos, and review your dashboard.</p>
+                </div>
+                <div class="sidebar-metrics">
+                    <div class="metric-card">
+                        <span class="metric-label">Net Worth</span>
+                        <strong id="sidebar-networth">$0.00</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Cash</span>
+                        <strong id="sidebar-cash">$0.00</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">All Time P&L</span>
+                        <strong id="sidebar-pnl">$0.00</strong>
+                    </div>
+                </div>
+                <nav class="user-nav">
+                    <button class="user-nav-link active" data-target="panel-overview">Overview</button>
+                    <button class="user-nav-link" data-target="panel-market">Market</button>
+                    <button class="user-nav-link" data-target="panel-trade">Trade</button>
+                    <button class="user-nav-link" data-target="panel-promos">Promos</button>
+                </nav>
+            </aside>
+            <main class="user-main">
+                <div class="app-header">
+                    <div>
+                        <h2 id="account-username">Stock Details & Portfolios</h2>
+                        <p id="account-email" class="small-note">Your trading portal dashboard</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="input-wrap promo-inline-input">
+                            <input class="inp" id="promo-input" type="text" placeholder="Promo Code" aria-label="Promo code">
+                        </div>
+                        <button class="btn btn-primary" id="redeem-button" type="button">Redeem</button>
+                        <button class="btn btn-ghost" id="logout-button" type="button">Logout</button>
+                    </div>
+                </div>
+
+                <div class="message" id="message"></div>
+
+                <section id="panel-overview" class="user-panel">
+                    <div class="dashboard-grid">
+                        <div class="market-panel market-card">
+                            <div class="panel-top">
+                                <h3>Live Market</h3>
+                                <span class="panel-note">Real-time pricing updated automatically.</span>
+                            </div>
+                            <div class="market-table">
+                                <div class="market-table-head">
+                                    <span>Asset</span>
+                                    <span>Price</span>
+                                    <span>Action</span>
+                                </div>
+                                <div id="live-market-rows" class="market-table-body"></div>
+                            </div>
+                        </div>
+                        <div class="portfolio-panel market-card">
+                            <div class="panel-top">
+                                <h3>My Portfolio</h3>
+                                <span class="panel-note">Track holdings, value, and performance.</span>
+                            </div>
+                            <div class="portfolio-table">
+                                <div class="portfolio-table-head">
+                                    <span>Asset</span>
+                                    <span>Qty</span>
+                                    <span>Avg Cost</span>
+                                    <span>PnL</span>
+                                    <span>Value</span>
+                                </div>
+                                <div id="portfolio-rows" class="portfolio-table-body"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="panel-market" class="user-panel hidden">
+                    <h3>Market Snapshot</h3>
+                    <div id="market-list" class="market-list"></div>
+                </section>
+
+                <section id="panel-trade" class="user-panel hidden">
+                    <h3>Buy / Sell Stocks</h3>
+                    <form id="trade-form">
+                        <div class="field">
+                            <label for="stock-select">Stock</label>
+                            <div class="input-wrap">
+                                <select class="inp" id="stock-select" aria-label="Stock"></select>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="trade-quantity">Quantity</label>
+                            <div class="input-wrap">
+                                <input class="inp" id="trade-quantity" name="quantity" type="number" min="1" value="1" placeholder="1" aria-label="Quantity">
+                            </div>
+                        </div>
+                        <div class="trade-grid">
+                            <button class="btn btn-primary" id="buy-button" type="button">Buy</button>
+                            <button class="btn btn-ghost" id="sell-button" type="button">Sell</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="panel-promos" class="user-panel hidden promo-section">
+                    <h3>Promo Code Activation</h3>
+                    <div class="field">
+                        <div class="input-wrap">
+                            <input class="inp" id="promo-input-panel" type="text" placeholder="Enter promo code" aria-label="Promo code">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="redeem-button" type="button">Redeem Promo</button>
+                    <div id="promo-list" class="promo-list"></div>
+                </section>
+            </main>
         </div>
     </div>
 

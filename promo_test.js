@@ -1,8 +1,8 @@
 const http = require('http');
-const loginData = JSON.stringify({ username: 'admin', password: 'Admin@1234' });
+const loginData = JSON.stringify({ username: 'Sankeerth', password: 'Satyamani80' });
 const loginOptions = {
   hostname: '127.0.0.1',
-  port: 3001,
+  port: 3000,
   path: '/api/login',
   method: 'POST',
   headers: {
@@ -18,7 +18,7 @@ const req = http.request(loginOptions, (res) => {
     console.log('LOGIN', res.statusCode, body);
     if (res.statusCode !== 200) return;
     const token = JSON.parse(body).token;
-    const promoData = JSON.stringify({ code: 'TEST123', discountPercent: 10, maxUses: 5 });
+    const promoData = JSON.stringify({ code: 'TEST123', amount: 1000, maxUses: 5 });
     const promoOptions = {
       hostname: '127.0.0.1',
       port: 3001,

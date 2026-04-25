@@ -1,0 +1,54 @@
+name: Node.js CI and Docker Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >
+          --health-cmd="mongo --eval 'db.adminCommand(\"ping\")'" \
+          --health-interval=10s \
+          --health-timeout=5s \
+          --health-retries=5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start server
+        env:
+          MONGODB_URI: mongodb://localhost:27017/quantumtrade
+          JWT_SECRET: qa-workflow-secret
+          ADMIN_USERNAME: Sankeerth
+          ADMIN_PASSWORD: Satyamani80
+        run: |
+          npm start &
+          for i in {1..20}; do
+            if curl --fail --silent http://localhost:3000/health; then
+              echo 'Server is responding';
+              break;
+            fi
+            sleep 2
+          done
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: quantumtrade:latest
