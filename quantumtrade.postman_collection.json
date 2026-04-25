@@ -227,6 +227,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "unique-uuid-here"
 							}
 						],
 						"body": {
