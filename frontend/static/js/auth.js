@@ -153,16 +153,51 @@ function switchMethod(method) {
 }
 
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, {
-    ...options,
-    headers: { ...(options.headers || {}), ...getAuthHeaders() },
-  });
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : {};
-  if (!response.ok) {
-    throw new Error(data.error || data.message || response.statusText || 'Request failed');
+  const isRetryable = (options.method === 'GET') || options.headers?.['Idempotency-Key'];
+  
+  let attempts = 0;
+  const maxAttempts = isRetryable ? 2 : 1; // 1 retry if safe
+
+  while (attempts < maxAttempts) {
+    attempts++;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second fetch timeout
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: { ...(options.headers || {}), ...getAuthHeaders() },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+      
+      if (!response.ok) {
+        // Validation errors use .message instead of .error now
+        throw new Error(data.message || data.error || response.statusText || 'Request failed');
+      }
+      return data;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      
+      // If it's the last attempt or not a network/abort error, throw
+      if (attempts >= maxAttempts || (err.message !== 'Failed to fetch' && err.name !== 'AbortError')) {
+        if (err.name === 'AbortError') {
+          throw new Error('Server busy, try again (timeout).');
+        }
+        throw err;
+      }
+      // Wait a short delay before retry
+      await new Promise(r => setTimeout(r, 500));
+    }
   }
-  return data;
+}
+
+function generateIdempotencyKey() {
+  return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
 async function postAuth(endpoint, payload) {
@@ -197,29 +232,48 @@ function validateEmail(value) {
 }
 
 async function handleSignIn() {
+  const btn = document.getElementById('btnSignIn');
+  const originalText = btn ? btn.textContent : 'Log In';
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
   const username = document.getElementById('siUsername').value.trim();
   const password = document.getElementById('siPassword').value;
   if (!username || !password) {
     setAuthMessage('Please enter username and password.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = originalText; }
     return;
   }
-  await postAuth('/api/auth/login', { username, password });
+  try {
+    await postAuth('/api/auth/login', { username, password });
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = originalText; }
+  }
 }
 
 async function handleSignUp() {
+  const btn = document.getElementById('btnSignUp');
+  const originalText = btn ? btn.textContent : 'Create Account';
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing...'; }
+
   const username = document.getElementById('suUsername').value.trim();
   const email = document.getElementById('suEmail').value.trim();
   const phone = document.getElementById('suPhone')?.value.trim() || '';
   const password = document.getElementById('suPassword').value;
   if (!username || !password) {
     setAuthMessage('Username and password are required.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = originalText; }
     return;
   }
   if (email && !validateEmail(email)) {
     setAuthMessage('Enter a valid email address or leave it blank.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = originalText; }
     return;
   }
-  await postAuth('/api/auth/register', { username, password, email, phone });
+  try {
+    await postAuth('/api/auth/register', { username, password, email, phone });
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = originalText; }
+  }
 }
 
 function generateOtp() {
@@ -370,24 +424,33 @@ async function loadPromoCodes() {
 }
 
 async function redeemPromo() {
-  const promoInput = document.getElementById('promo-input');
-  if (!promoInput) return;
-  const code = promoInput.value.trim();
-  if (!code) {
-    setAuthMessage('Enter a promo code before redeeming.', 'error');
-    return;
-  }
+  const codeInput = document.getElementById('promo-input');
+  const btn = document.getElementById('redeem-btn') || codeInput.nextElementSibling;
+  
+  const code = codeInput.value.trim();
+  if (!code) return alert('Enter a promo code');
+
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Processing...";
 
   try {
     const result = await fetchJson('/api/promos/redeem', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': generateIdempotencyKey()
+      },
       body: JSON.stringify({ code }),
     });
     setAuthMessage(`Promo redeemed: $${Number(result.amount).toFixed(2)} added to your balance.`, 'success');
-    promoInput.value = '';
+    codeInput.value = '';
     await Promise.all([loadAccount(), loadPromoCodes()]);
   } catch (error) {
     setAuthMessage(error.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 }
 
@@ -395,24 +458,42 @@ async function tradeStock(action) {
   const stockSelect = document.getElementById('stock-select');
   const quantityInput = document.getElementById('trade-quantity');
   if (!stockSelect || !quantityInput) return;
+  
   const symbol = stockSelect.value;
   const quantity = Number(quantityInput.value);
-  if (!symbol || !quantity || quantity <= 0) {
-    setAuthMessage('Choose a stock and enter a valid quantity.', 'error');
+
+  if (!symbol || quantity <= 0) {
+    setAuthMessage('Please select a valid stock and quantity greater than 0.', 'error');
     return;
   }
+
+  // Find the button that triggered this (Buy or Sell)
+  const buttons = document.querySelectorAll('.trade-actions button');
+  const originalTexts = [];
+  buttons.forEach(btn => {
+    originalTexts.push(btn.textContent);
+    btn.disabled = true;
+    if (btn.textContent.toLowerCase().includes(action)) btn.textContent = 'Processing...';
+  });
 
   try {
     const endpoint = action === 'sell' ? '/api/trade/sell' : '/api/trade/buy';
     const result = await fetchJson(endpoint, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symbol, quantity }),
     });
-    setAuthMessage(result.message, 'success');
+
+    setAuthMessage(result.message || `Trade successful! ${action.toUpperCase()} ${quantity} ${symbol}.`, 'success');
     quantityInput.value = '1';
     await Promise.all([loadAccount(), loadMarket()]);
   } catch (error) {
     setAuthMessage(error.message, 'error');
+  } finally {
+    buttons.forEach((btn, index) => {
+      btn.disabled = false;
+      btn.textContent = originalTexts[index];
+    });
   }
 }
 
