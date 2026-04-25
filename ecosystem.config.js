@@ -6,7 +6,7 @@ module.exports = {
       instances: 'max',
       exec_mode: 'cluster',
       autorestart: true,
-      watch: true,
+      watch: false,
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'development',
