@@ -14,7 +14,7 @@ const generateToken = (id, username, role) => {
 exports.register = async (req, res, next) => {
   try {
     const { username, password, phone, email } = req.body;
-    
+
     const normalizedUsername = String(username || '').trim();
     const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
 
@@ -26,6 +26,7 @@ exports.register = async (req, res, next) => {
     const existingUser = await User.findOne({ $or: orConditions });
 
     if (existingUser) {
+      console.warn(`[auth] register conflict: username='${normalizedUsername}' email='${normalizedEmail || ''}' ip=${req.ip}`);
       return res.status(409).json({ error: 'Username or email already exists' });
     }
 
@@ -41,6 +42,7 @@ exports.register = async (req, res, next) => {
     });
 
     await user.save();
+    console.log(`[auth] register success: username='${user.username}' id=${user._id} ip=${req.ip}`);
 
     res.status(201).json({
       token: generateToken(user._id, user.username, user.role),
@@ -54,6 +56,7 @@ exports.register = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error(`[auth] register error: username='${req.body?.username}' ip=${req.ip} — ${error.message}`);
     next(error);
   }
 };
@@ -71,14 +74,17 @@ exports.login = async (req, res, next) => {
     });
 
     if (!user || !user.password) {
+      console.warn(`[auth] login failed (user not found): identifier='${loginIdentifier}' ip=${req.ip}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.warn(`[auth] login failed (bad password): username='${user.username}' id=${user._id} ip=${req.ip}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log(`[auth] login success: username='${user.username}' id=${user._id} role=${user.role} ip=${req.ip}`);
     res.json({
       token: generateToken(user._id, user.username, user.role),
       user: {
@@ -91,6 +97,7 @@ exports.login = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error(`[auth] login error: identifier='${req.body?.username}' ip=${req.ip} — ${error.message}`);
     next(error);
   }
 };
@@ -132,9 +139,13 @@ exports.googleLogin = async (req, res, next) => {
         holdings: {},
       });
       await user.save();
+      console.log(`[auth] google login: new user created username='${user.username}' id=${user._id} ip=${req.ip}`);
     } else if (!user.googleId) {
       user.googleId = googleId;
       await user.save();
+      console.log(`[auth] google login: linked googleId to existing user username='${user.username}' id=${user._id} ip=${req.ip}`);
+    } else {
+      console.log(`[auth] google login success: username='${user.username}' id=${user._id} ip=${req.ip}`);
     }
 
     res.json({
@@ -149,6 +160,7 @@ exports.googleLogin = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error(`[auth] google login error: ip=${req.ip} — ${error.message}`);
     res.status(401).json({ error: 'Invalid Google ID token' });
   }
 };
