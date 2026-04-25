@@ -45,7 +45,7 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (curl, Postman, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app')) return callback(null, true);
     callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
