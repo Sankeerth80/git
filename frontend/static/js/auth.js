@@ -506,6 +506,28 @@ async function showUserPanel(panelId) {
   });
 }
 
+function updateAuthUI() {
+  const token = window.localStorage.getItem(authTokenKey);
+  const loggedIn = Boolean(token);
+  const authWrap = document.querySelector('.auth-wrap');
+  const appView = document.getElementById('app-view');
+  
+  if (authWrap && appView) {
+    if (loggedIn) {
+      authWrap.style.display = 'none';
+      appView.classList.remove('hidden');
+    } else {
+      authWrap.style.display = 'flex';
+      appView.classList.add('hidden');
+    }
+  }
+}
+
+function logout() {
+  saveAuthToken(null);
+  updateAuthUI();
+  showToast('Logged out successfully', true);
+}
 async function initializeApp() {
   updateAuthUI();
   await Promise.all([loadAccount(), loadMarket(), loadPromoCodes()]);
