@@ -36,7 +36,7 @@ exports.register = async (req, res, next) => {
       email: normalizedEmail,
       password: hashedPassword,
       phone,
-      ip: req.ip,
+      ip,
       cash: 1000,
       holdings: {},
     });
@@ -64,6 +64,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
+    const ip = req.ip;
 
     const loginIdentifier = String(username || '').trim();
     const user = await User.findOne({
@@ -106,7 +107,10 @@ exports.googleLogin = async (req, res, next) => {
   // Same logic as before, refactored to controller
   try {
     const { idToken } = req.body;
+    const ip = req.ip;
+
     if (!GOOGLE_CLIENT_ID) {
+      console.error(`[auth] google login error: GOOGLE_CLIENT_ID not configured ip=${ip}`);
       return res.status(500).json({ error: 'Google client ID is not configured' });
     }
 
@@ -134,7 +138,7 @@ exports.googleLogin = async (req, res, next) => {
         email,
         googleId,
         role: 'user',
-        ip: req.ip,
+        ip,
         cash: 1000,
         holdings: {},
       });

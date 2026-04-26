@@ -161,7 +161,7 @@ async function fetchJson(url, options = {}) {
   while (attempts < maxAttempts) {
     attempts++;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second fetch timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second fetch timeout
     
     try {
       const response = await fetch(url, {
