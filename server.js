@@ -37,15 +37,16 @@ connectDB();
 app.use(helmet());
 app.use(compression());
 
+// CORS — build allowed origins from env or fall back to localhost for dev
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (curl, Postman, server-to-server)
+    // Allow requests with no origin (e.g. curl, Postman, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app') || origin.endsWith('.onrender.com')) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -121,8 +122,7 @@ async function ensureAdminUser() {
 
     if (!adminUsername || !adminPassword) {
       console.warn(
-        'ensureAdminUser: ADMIN_USERNAME or ADMIN_PASSWORD env var is not set — skipping admin creation. ' +
-        'Set both env vars to create an initial admin account.'
+        'ensureAdminUser: ADMIN_USERNAME or ADMIN_PASSWORD env vars are not set — skipping admin creation.'
       );
       return;
     }
