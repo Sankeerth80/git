@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
   try {
     await mongoose.connect('mongodb://127.0.0.1:27017/quantumtrade_test');
     const admin = await User.findOne({ role: 'admin' }).lean();
-    console.log('admin', admin ? { username: admin.username, role: admin.role, password: admin.password } : null);
+    console.log('admin', admin ? { username: admin.username, role: admin.role, hasPassword: !!admin.password } : null);
     if (admin) {
       const ok = await bcrypt.compare('Satyamani80', admin.password);
       console.log('password match', ok);

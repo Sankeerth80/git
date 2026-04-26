@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { getMarketData, getMarketHistory, getMarketTrend, getMarketNarrative, updateAllMarkets } = require('../utils/marketUtil');
 const Promo = require('../models/Promo');
+const { apiLimiter } = require('../middleware/rateLimiter');
+
+router.use(apiLimiter);
 
 router.get('/', async (req, res, next) => {
   try {

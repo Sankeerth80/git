@@ -4,8 +4,11 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const Promo = require('../models/Promo');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
+router.use(apiLimiter);
+
 const JWT_SECRET = process.env.JWT_SECRET || 'quantumtrade-secret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);

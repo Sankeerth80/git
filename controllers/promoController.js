@@ -35,6 +35,8 @@ exports.createPromo = async (req, res, next) => {
 
     if (!code) {
       code = generatePromoCode(10);
+    } else {
+      code = String(code);
     }
 
     const existingPromo = await Promo.findOne({ code });
@@ -79,8 +81,9 @@ exports.redeemPromo = async (req, res, next) => {
   try {
     const { code } = req.body;
     const userId = req.user.id;
+    const safeCode = String(code);
 
-    const promo = await Promo.findOne({ code }).session(session);
+    const promo = await Promo.findOne({ code: safeCode }).session(session);
     if (!promo || !promo.active) {
       throw new Error('Promo code not found or inactive');
     }

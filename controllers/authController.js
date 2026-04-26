@@ -7,6 +7,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'quantumtrade-secret';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 const generateToken = (id, username, role) => {
   return jwt.sign({ id, username, role }, JWT_SECRET, { expiresIn: '7d' });
 };
@@ -19,7 +23,7 @@ exports.register = async (req, res, next) => {
     const normalizedUsername = String(username || '').trim();
     const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
 
-    const orConditions = [{ username: new RegExp('^' + normalizedUsername + '$', 'i') }];
+    const orConditions = [{ username: new RegExp('^' + escapeRegex(normalizedUsername) + '$', 'i') }];
     if (normalizedEmail) {
       orConditions.push({ email: normalizedEmail });
     }
@@ -69,10 +73,11 @@ exports.login = async (req, res, next) => {
     const ip = req.ip;
 
     const loginIdentifier = String(username || '').trim();
+    const safeIdentifier = escapeRegex(loginIdentifier);
     const user = await User.findOne({
       $or: [
-        { username: new RegExp('^' + loginIdentifier + '$', 'i') },
-        { email: new RegExp('^' + loginIdentifier + '$', 'i') },
+        { username: new RegExp('^' + safeIdentifier + '$', 'i') },
+        { email: new RegExp('^' + safeIdentifier + '$', 'i') },
       ],
     });
 

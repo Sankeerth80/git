@@ -140,7 +140,7 @@ async function ensureAdminUser() {
     });
 
     await adminUser.save();
-    console.log(`Default admin created: ${adminUsername}`);
+    console.log('Default admin created successfully.');
   } catch (error) {
     console.error('Failed to create admin user:', error.message);
   }
