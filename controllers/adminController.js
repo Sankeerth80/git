@@ -18,3 +18,13 @@ exports.getActivity = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.clearTestData = async (req, res, next) => {
+  try {
+    const resultUsers = await User.deleteMany({ role: { $ne: 'admin' } });
+    const resultTx = await Transaction.deleteMany({});
+    res.json({ message: `Successfully deleted ${resultUsers.deletedCount} test users and ${resultTx.deletedCount} transactions.` });
+  } catch (error) {
+    next(error);
+  }
+};

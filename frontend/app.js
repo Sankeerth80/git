@@ -691,6 +691,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  const btnClearData = document.getElementById('btn-clear-data');
+  if (btnClearData) {
+    btnClearData.addEventListener('click', async () => {
+      if (!confirm("Are you sure you want to delete ALL test users and transactions? This cannot be undone!")) return;
+      try {
+        const result = await fetchJson('/api/admin/clear-test-data', { method: 'DELETE' });
+        setMessage(result.message || 'Test data cleared successfully', 'info');
+        loadProfile();
+      } catch (err) {
+        setMessage(err.message, 'error');
+      }
+    });
+  }
+
   updateAuthUI();
   if (state.token) {
     loadProfile();
