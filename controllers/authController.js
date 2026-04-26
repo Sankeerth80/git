@@ -14,6 +14,7 @@ const generateToken = (id, username, role) => {
 exports.register = async (req, res, next) => {
   try {
     const { username, password, phone, email } = req.body;
+    const ip = req.ip;
 
     const normalizedUsername = String(username || '').trim();
     const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
