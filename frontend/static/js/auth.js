@@ -393,13 +393,20 @@ function renderPortfolio(account) {
 async function loadAccount() {
   try {
     const account = await fetchJson('/api/users/me');
-    document.getElementById('account-username').textContent = `${account.username || 'Trader'}`;
-    document.getElementById('account-email').textContent = account.email || 'No email provided';
-    document.getElementById('account-cash').textContent = `$${Number(account.cash).toFixed(2)}`;
-    document.getElementById('account-pnl').textContent = `$${Number(account.pnl).toFixed(2)}`;
-    document.getElementById('sidebar-cash').textContent = `$${Number(account.cash).toFixed(2)}`;
-    document.getElementById('sidebar-pnl').textContent = `$${Number(account.pnl).toFixed(2)}`;
-    document.getElementById('sidebar-networth').textContent = `$${Number(account.cash + (account.portfolio?.totalValue || 0)).toFixed(2)}`;
+    const elUser = document.getElementById('account-username');
+    if (elUser) elUser.textContent = `${account.username || 'Trader'}`;
+    const elEmail = document.getElementById('account-email');
+    if (elEmail) elEmail.textContent = account.email || 'No email provided';
+    const elCash = document.getElementById('account-cash');
+    if (elCash) elCash.textContent = `$${Number(account.cash).toFixed(2)}`;
+    const elPnl = document.getElementById('account-pnl');
+    if (elPnl) elPnl.textContent = `$${Number(account.pnl).toFixed(2)}`;
+    const sbCash = document.getElementById('sidebar-cash');
+    if (sbCash) sbCash.textContent = `$${Number(account.cash).toFixed(2)}`;
+    const sbPnl = document.getElementById('sidebar-pnl');
+    if (sbPnl) sbPnl.textContent = `$${Number(account.pnl).toFixed(2)}`;
+    const sbNetworth = document.getElementById('sidebar-networth');
+    if (sbNetworth) sbNetworth.textContent = `$${Number(account.cash + (account.portfolio?.totalValue || 0)).toFixed(2)}`;
     renderPortfolio(account);
   } catch (error) {
     setAuthMessage('Unable to load account details. Please log in again.', 'error');
