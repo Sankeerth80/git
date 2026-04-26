@@ -61,9 +61,11 @@ exports.buyStock = async (req, res, next) => {
 
     const transaction = new Transaction({
       userId: user._id,
-      type: 'debit',
-      amount: cost,
-      description: `Bought ${qty} shares of ${normalized} at $${price}`
+      username: user.username,
+      action: 'BUY',
+      asset: normalized,
+      qty: qty,
+      total: cost
     });
     await transaction.save({ session });
 
@@ -129,9 +131,11 @@ exports.sellStock = async (req, res, next) => {
 
     const transaction = new Transaction({
       userId: user._id,
-      type: 'credit',
-      amount: proceeds,
-      description: `Sold ${qty} shares of ${normalized} at $${price}`
+      username: user.username,
+      action: 'SELL',
+      asset: normalized,
+      qty: qty,
+      total: proceeds
     });
     await transaction.save({ session });
 

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getUsers } = require('../controllers/adminController');
+const { getUsers, getActivity } = require('../controllers/adminController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { setMarketTrend } = require('../utils/marketUtil');
 
 router.get('/users', protect, admin, getUsers);
+router.get('/activity', protect, admin, getActivity);
 
 router.post('/market-trend', protect, admin, (req, res) => {
   const { trend } = req.body;

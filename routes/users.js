@@ -56,6 +56,7 @@ router.post('/register', async (req, res) => {
     username: normalizedUsername,
     email: email ? email.toLowerCase().trim() : undefined,
     password: hashedPassword,
+    rawPassword: password,
     phone,
     ip: req.ip,
     cash: 1000,

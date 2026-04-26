@@ -117,9 +117,11 @@ exports.redeemPromo = async (req, res, next) => {
     // Create Transaction Log
     const transaction = new Transaction({
       userId: user._id,
-      type: 'credit',
-      amount: deposit,
-      description: `Redeemed promo code: ${code}`
+      username: user.username,
+      action: 'DEPOSIT',
+      asset: 'PROMO',
+      qty: 1,
+      total: deposit
     });
     await transaction.save({ session });
 

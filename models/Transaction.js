@@ -2,9 +2,11 @@ const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  type: { type: String, enum: ['credit', 'debit'], required: true },
-  amount: { type: Number, required: true },
-  description: { type: String, required: true },
+  username: { type: String, required: true },
+  action: { type: String, enum: ['BUY', 'SELL', 'DEPOSIT', 'WITHDRAW'], required: true },
+  asset: { type: String, required: true },
+  qty: { type: Number, required: true },
+  total: { type: Number, required: true },
   date: { type: Date, default: Date.now }
 });
 

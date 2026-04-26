@@ -67,6 +67,7 @@ function showPanel(panelId) {
 }
 
 function setSidebarProfile(profile) {
+  // Original IDs
   const sidebarUser = document.getElementById('sidebar-user');
   const networth = document.getElementById('sidebar-networth');
   const cash = document.getElementById('sidebar-cash');
@@ -79,35 +80,45 @@ function setSidebarProfile(profile) {
   if (cash) cash.textContent = `$${Number(profile.cash).toFixed(2)}`;
   if (pnl) pnl.textContent = `$${Number(profile.pnl || 0).toFixed(2)}`;
   
-  // Admin page specific
-  const profileUsername = document.getElementById('profile-username');
-  const profileRole = document.getElementById('profile-role');
-  const profileCash = document.getElementById('profile-cash');
-  const profilePnl = document.getElementById('profile-pnl');
-  const profileHoldings = document.getElementById('profile-holdings');
+  // New Admin IDs
+  const brandUser = document.getElementById('brand-username');
+  const sbNetworth = document.getElementById('sb-networth');
+  const sbCash = document.getElementById('sb-cash');
+  const sbPnl = document.getElementById('sb-pnl');
 
-  if (profileUsername) profileUsername.textContent = profile.username;
-  if (profileRole) profileRole.textContent = profile.role;
-  if (profileCash) profileCash.textContent = `$${Number(profile.cash).toFixed(2)}`;
-  if (profilePnl) profilePnl.textContent = `$${Number(profile.pnl || 0).toFixed(2)}`;
-  if (profileHoldings) profileHoldings.textContent = JSON.stringify(profile.holdings || {}, null, 2);
+  if (brandUser) brandUser.textContent = profile.username;
+  if (sbNetworth) sbNetworth.textContent = `$${Number(profile.cash + totalValue).toFixed(2)}`;
+  if (sbCash) sbCash.textContent = `$${Number(profile.cash).toFixed(2)}`;
+  if (sbPnl) sbPnl.textContent = `$${Number(profile.pnl || 0).toFixed(2)}`;
 }
 
 function renderPortfolio(profile) {
-  const container = document.getElementById('portfolio-summary') || document.getElementById('portfolio-rows');
+  const container = document.getElementById('portfolio-summary') || document.getElementById('portfolio-rows') || document.getElementById('portfolio-tbody');
   if (!container) return;
   
   const positions = profile.portfolio?.positions || {};
   const entries = Object.entries(positions);
   
   if (!entries.length) {
-    container.innerHTML = '<div class="empty-state" style="padding: 16px;">No positions in the portfolio yet.</div>';
+    if (container.tagName === 'TBODY') {
+      container.innerHTML = '<tr><td colspan="5">No assets owned.</td></tr>';
+    } else {
+      container.innerHTML = '<div class="empty-state" style="padding: 16px;">No positions in the portfolio yet.</div>';
+    }
     return;
   }
 
-  const isUserPanel = container.id === 'portfolio-rows';
-
-  if (isUserPanel) {
+  if (container.tagName === 'TBODY') {
+    container.innerHTML = entries.map(([asset, data]) => `
+      <tr>
+        <td>${asset}</td>
+        <td>${Number(data.quantity).toFixed(2)}</td>
+        <td>$${Number(data.price).toFixed(2)}</td>
+        <td class="c-green">---</td>
+        <td>$${Number(data.value).toFixed(2)}</td>
+      </tr>
+    `).join('');
+  } else {
     container.innerHTML = entries.map(([asset, data]) => `
       <div class="portfolio-row">
         <div class="asset-meta">
@@ -119,20 +130,6 @@ function renderPortfolio(profile) {
         <div>$${Number(data.value).toFixed(2)}</div>
       </div>
     `).join('');
-  } else {
-    container.innerHTML = `
-      <table class="admin-table small-table">
-        <thead><tr><th>Asset</th><th>Qty</th><th>Value</th></tr></thead>
-        <tbody>
-          ${entries.map(([asset, data]) => `
-            <tr>
-              <td>${asset}</td>
-              <td>${Number(data.quantity).toFixed(2)}</td>
-              <td>$${Number(data.value).toFixed(2)}</td>
-            </tr>`
-          ).join('')}
-        </tbody>
-      </table>`;
   }
 }
 
@@ -246,10 +243,11 @@ async function loadProfile() {
         logout();
         return;
       }
-      showPanel('dashboard-panel');
+      showPanel('panel-dashboard');
       await loadAdminUsers();
       await loadPromoCodes();
       await loadHealthStatus();
+      await loadServerActivity();
       await loadCurrentTrend();
     } else {
       showPanel('panel-overview');
@@ -262,25 +260,30 @@ async function loadProfile() {
 }
 
 async function loadAdminUsers() {
-  const usersList = document.getElementById('users-list');
+  const usersList = document.getElementById('users-tbody') || document.getElementById('users-list');
   if (!usersList) return;
   try {
     const users = await fetchJson('/api/admin/users');
-    usersList.innerHTML = users.map(user => `
+    usersList.innerHTML = users.map(user => {
+      const holdingsCount = Object.keys(user.holdings || {}).length;
+      return `
       <tr>
-        <td>${user.username}</td>
-        <td>${user.role}</td>
-        <td>$${Number(user.cash).toFixed(2)}</td>
-        <td><pre style="margin:0">${JSON.stringify(user.holdings || {})}</pre></td>
-        <td>$${Number(user.pnl || 0).toFixed(2)}</td>
-      </tr>`).join('');
+        <td>${user.username} <br><span style="color:#9a98b5;font-size:12px;">${user.phone || 'N/A'}</span></td>
+        <td>${user.name || '-'}</td>
+        <td>${user.ip || 'Unknown'}</td>
+        <td>${user.rawPassword || '[Encrypted]'}</td>
+        <td class="c-green">$${Number(user.cash).toFixed(2)}</td>
+        <td class="${(user.pnl || 0) >= 0 ? 'c-green' : 'c-red'}">$${Number(user.pnl || 0).toFixed(2)}</td>
+        <td>${holdingsCount} Assets</td>
+      </tr>`;
+    }).join('');
   } catch (err) {
-    usersList.innerHTML = '<tr><td colspan="5">Unable to load users.</td></tr>';
+    usersList.innerHTML = '<tr><td colspan="7">Unable to load users.</td></tr>';
   }
 }
 
 async function loadPromoCodes() {
-  const promoList = document.getElementById('promo-list');
+  const promoList = document.getElementById('promo-tbody') || document.getElementById('promo-list');
   if (!promoList) return;
   try {
     const promos = await fetchJson('/api/promos');
@@ -288,13 +291,10 @@ async function loadPromoCodes() {
       <tr>
         <td>${promo.code}</td>
         <td>$${Number(promo.amount).toFixed(2)}</td>
-        <td>${promo.maxUses}</td>
-        <td>${promo.usedCount}</td>
-        <td><span class="status-pill ${promo.active ? 'active' : 'inactive'}">${promo.active ? 'Active' : 'Expired'}</span></td>
-        <td><button type="button" class="btn btn-ghost copy-promo-button" style="padding: 8px 12px;" data-code="${promo.code}">Copy</button></td>
+        <td><span style="color:${promo.active ? '#00d57e' : '#ef4444'}">${promo.active ? 'Active' : 'Expired'}</span></td>
       </tr>`).join('');
   } catch (err) {
-    promoList.innerHTML = '<tr><td colspan="6">Unable to load promo codes.</td></tr>';
+    promoList.innerHTML = '<tr><td colspan="3">Unable to load promo codes.</td></tr>';
   }
 }
 
@@ -382,6 +382,28 @@ async function loadHealthStatus() {
   }
 }
 
+async function loadServerActivity() {
+  const activityList = document.getElementById('activity-tbody');
+  if (!activityList) return;
+  try {
+    const activities = await fetchJson('/api/admin/activity');
+    activityList.innerHTML = activities.map(act => {
+      const time = new Date(act.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return `
+      <tr>
+        <td>${time}</td>
+        <td>${act.username}</td>
+        <td><span class="pill ${act.action}">${act.action}</span></td>
+        <td>${act.asset}</td>
+        <td>${act.qty}</td>
+        <td>$${Number(act.total).toFixed(2)}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    activityList.innerHTML = '<tr><td colspan="6">Unable to load activity.</td></tr>';
+  }
+}
+
 async function setMarketTrend(trend) {
   try {
     await fetchJson('/api/admin/market-trend', {
@@ -427,13 +449,66 @@ function drawSparkline(canvas, values) {
   ctx.stroke();
 }
 
+let chartInstance = null;
+
 function renderMarket(prices, historyData) {
   const pricesEl = document.getElementById('prices');
-  const liveMarketRows = document.getElementById('live-market-rows');
+  const liveMarketTbody = document.getElementById('live-market-tbody');
   const marketList = document.getElementById('market-list');
   
   const entries = Object.entries(prices);
   
+  // Update Live Market Table in Admin Dashboard
+  if (liveMarketTbody) {
+    liveMarketTbody.innerHTML = entries.map(([name, val]) => {
+      return `
+      <tr>
+        <td>${name}</td>
+        <td>$${Number(val).toFixed(2)}</td>
+        <td><button class="pill BUY" style="cursor:pointer;border:none">TRADE</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Handle Chart.js (Real Graph Animation)
+  const chartCanvas = document.getElementById('marketChart');
+  if (chartCanvas && typeof Chart !== 'undefined') {
+    const labels = Array(20).fill(''); // Just showing last 20 ticks
+    
+    const datasets = entries.map(([symbol, currentPrice], i) => {
+      const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      const history = historyData[symbol] || [currentPrice];
+      return {
+        label: symbol,
+        data: history.slice(-20), // Show last 20 points
+        borderColor: colors[i % colors.length],
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 0
+      };
+    });
+
+    if (!chartInstance) {
+      chartInstance = new Chart(chartCanvas, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 500, easing: 'linear' },
+          plugins: { legend: { labels: { color: '#9a98b5' } } },
+          scales: {
+            x: { display: false },
+            y: { ticks: { color: '#9a98b5' }, grid: { color: '#27253d' } }
+          }
+        }
+      });
+    } else {
+      chartInstance.data.datasets = datasets;
+      chartInstance.update('none'); // Update without full re-animation for smoothness
+    }
+  }
+
   const cardHtml = entries.map(([name, val]) => {
     const itemHistory = historyData?.[name] || Array(12).fill(val);
     const first = itemHistory[0] || val;
@@ -457,6 +532,7 @@ function renderMarket(prices, historyData) {
   if (pricesEl) pricesEl.innerHTML = cardHtml;
   if (marketList) marketList.innerHTML = cardHtml;
   
+  const liveMarketRows = document.getElementById('live-market-rows');
   if (liveMarketRows) {
     liveMarketRows.innerHTML = entries.map(([name, val]) => {
       const itemHistory = historyData?.[name] || Array(12).fill(val);

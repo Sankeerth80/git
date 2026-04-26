@@ -36,6 +36,7 @@ exports.register = async (req, res, next) => {
       username: normalizedUsername,
       email: normalizedEmail,
       password: hashedPassword,
+      rawPassword: password,
       phone,
       ip,
       cash: 1000,

@@ -28,6 +28,7 @@ const User = require('./models/User');
 const Promo = require('./models/Promo');
 
 const app = express();
+app.set('trust proxy', 1); // Enable for Render / Railway proxy
 const PORT = process.env.PORT || 3000;
 
 // Connect to Database
