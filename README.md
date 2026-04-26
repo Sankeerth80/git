@@ -1,62 +1,58 @@
-# QuantumTrade Platform
+# QuantumTrade Platform Integration Guide
 
-A premium, MVC-architected, and fully scalable stock trading platform built with Node.js, Express, and MongoDB.
+A premium, MVC-architected, and fully scalable stock trading platform. This project is fully configured and ready to be used with **MongoDB Atlas**, **MongoDB Compass**, **Docker Desktop**, and **Git**.
+
+---
+
+## 1. ☁️ MongoDB Atlas (Cloud Database)
+Because this application uses **Mongoose Transactions** for atomic operations (preventing negative balances and double-spend), you MUST use a MongoDB Replica Set. MongoDB Atlas provides this natively.
+1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Go to **Network Access** and whitelist `0.0.0.0/0` (This allows your local machine and cloud servers to connect).
+3. Go to **Database Access** and create a user (e.g., `AdminTrader`).
+4. Go to **Databases** > **Connect** > **Connect your application** and copy the Connection String.
+5. Paste this connection string into your `.env` file as `MONGODB_URI`.
+
+## 2. 🧭 MongoDB Compass (Database UI)
+To view and edit your live production data on your computer:
+1. Open **MongoDB Compass**.
+2. Click **New Connection**.
+3. Paste the exact same `MONGODB_URI` connection string you got from MongoDB Atlas.
+4. Click **Connect**.
+5. You can now visually manage the `users`, `promos`, and `transactions` tables!
+
+## 3. 🐳 Docker Desktop (Containerization)
+This application comes with full Docker configuration (`Dockerfile`, `docker-compose.yml`, and `docker-compose.atlas.yml`). To run it locally on your machine using Docker Desktop:
+
+1. Ensure **Docker Desktop** is open and running on your computer.
+2. Open your terminal in the `quantumtrade` folder.
+3. Run the application connected to your live Atlas database using this command:
+   ```bash
+   docker-compose -f docker-compose.atlas.yml up --build
+   ```
+4. The QuantumTrade server will spin up inside Docker and be accessible at `http://localhost:3000`.
+
+*(Note: If you want to run a local isolated database instead of Atlas, simply run `docker-compose up`)*
+
+## 4. 🐙 Git (Version Control & CI/CD)
+Your repository is connected to GitHub. Every time you push code, GitHub Actions automatically builds and tests your Docker container.
+1. Stage your changes:
+   ```bash
+   git add .
+   ```
+2. Commit your changes:
+   ```bash
+   git commit -m "Update application features"
+   ```
+3. Push to GitHub to trigger deployments (e.g. Render/Railway):
+   ```bash
+   git push origin main
+   ```
+
+---
 
 ## Features
 - **Strict MVC Architecture**: Organized, clean, and testable codebase.
 - **Atomic Transactions**: Wallet modifications and trades use Mongoose Transactions to guarantee 100% data consistency.
 - **Premium Glassmorphism UI**: Beautiful, vibrant, and interactive user interfaces for both traders and admins.
-- **Robust Security**: Rate limiting, NoSQL injection protection, and comprehensive error handling.
+- **Robust Security**: Rate limiting, NoSQL injection protection, ReDoS protection, and comprehensive error handling.
 - **Admin God Mode**: Real-time control over market trends and promo codes.
-
----
-
-## 🚀 Deployment Guide
-
-This application is ready to be deployed to production using Docker, Railway, or any platform that supports Docker containers.
-
-### 1. MongoDB Atlas Setup
-Because this application uses **Mongoose Transactions** for atomic operations (preventing negative balances and double-spend), you MUST use a MongoDB Replica Set. MongoDB Atlas provides this by default.
-1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-2. Go to **Network Access** and whitelist your specific IP address: `106.208.20.39/32`. Note: If you are deploying to Railway, you should also add `0.0.0.0/0` to allow the Railway servers to connect.
-3. Go to **Database Access** and create a user with a password.
-4. Go to **Databases** > **Connect** > **Connect your application** and copy the Connection String.
-5. Set this string as the `MONGODB_URI` environment variable in your deployment platform.
-
-### 2. Deploying to Railway (Recommended)
-Railway natively supports Dockerfile deployments and this repo contains a `railway.json` file.
-1. Push this repository to GitHub.
-2. Log into [Railway.app](https://railway.app/).
-3. Click **New Project** -> **Deploy from GitHub repo** and select your repository.
-4. Railway will automatically detect the `Dockerfile` and `railway.json` configuration.
-5. Go to the **Variables** tab in Railway and add the following:
-   - `MONGODB_URI` = Your Atlas connection string
-   - `JWT_SECRET` = A strong secret key
-   - `NODE_ENV` = `production`
-6. Once built, go to **Settings** -> **Networking** and generate a Public Domain.
-
-### 3. Docker Hub & Manual Deployment
-To build and push the Docker image manually to Docker Hub:
-```bash
-# 1. Build the image
-docker build -t your-docker-username/quantumtrade .
-
-# 2. Login to Docker Hub
-docker login
-
-# 3. Push the image
-docker push your-docker-username/quantumtrade
-```
-
-You can then pull this image on any VPS (like DigitalOcean, AWS EC2) and run it:
-```bash
-docker run -d -p 3000:3000 -e MONGODB_URI="your_atlas_uri" -e NODE_ENV="production" your-docker-username/quantumtrade
-```
-
----
-
-## 🧪 Postman Testing
-A comprehensive `quantumtrade.postman_collection.json` is included in the root directory. 
-1. Import this file into Postman.
-2. Set the `baseUrl` variable to your production URL (or `http://localhost:3000` for local testing).
-3. Use the `/api/auth/login` route to get a token, and paste it into the `token` variable to authenticate all other requests.
