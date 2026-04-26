@@ -47,6 +47,7 @@ const marketData = Object.fromEntries(
 );
 
 function randomWalk(value, symbol) {
+  if (symbol === '__proto__' || symbol === 'constructor' || symbol === 'prototype') return value;
   const asset = marketAssets[symbol] || { volatility: 0.03, precision: 2 };
   const bias = trendBias[marketTrend] || 0;
   const momentum = asset.momentum || 0;
