@@ -45,7 +45,7 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (curl, Postman, server-to-server)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app')) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app') || origin.endsWith('.onrender.com')) return callback(null, true);
     callback(new Error(`CORS: origin '${origin}' not allowed`));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -169,12 +169,10 @@ mongoose.connection.once('open', () => {
 
 const server = http.createServer(app);
 
-if (require.main === module) {
-  server.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  });
-  // Prevent long-running idle connections from exhausting resources
-  server.setTimeout(15000);
-}
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
+// Prevent long-running idle connections from exhausting resources
+server.setTimeout(15000);
 
 module.exports = server;
