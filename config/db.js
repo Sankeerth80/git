@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+  mongoose.set('bufferCommands', false);
   const maxRetries = 5;
   let retries = 0;
 
@@ -10,6 +11,7 @@ const connectDB = async () => {
         maxPoolSize: 50,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
+        bufferCommands: false, // Don't buffer if not connected, throw error instead
       });
       console.log(`MongoDB Connected: ${conn.connection.host}`);
       return; // Success
